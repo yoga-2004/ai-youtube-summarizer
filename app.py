@@ -7,23 +7,19 @@ st.set_page_config(page_title="AI YouTube Summarizer", page_icon="📺", layout=
 st.title("📺 Smart YouTube Video Summarizer")
 st.write("Generate an AI summary of a YouTube video using its link or transcript text.")
 
-# Automatically pull the key out of your secure Streamlit secrets vault
-# Check the secret vault first; if empty, let the user type it manually in the sidebar
-api_key = st.secrets.get("GEMINI_API_KEY", "")
-
-if not api_key:
-    with st.sidebar:
-        st.header("🔑 Configuration")
-        api_key = st.text_input("Enter Gemini API Key:", type="password")
-
+# Revert to clean, manual sidebar entry to bypass all cloud vault errors
+with st.sidebar:
+    st.header("🔑 Configuration")
+    api_key = st.text_input("Enter Gemini API Key:", type="password")
+    st.markdown("[Get a free key here](https://google.com)")
 
 tab1, tab2 = st.tabs(["🔗 Summarize via Link", "📝 Paste Transcript Directly"])
 
 with tab1:
-    video_url = st.text_input("YouTube Video URL:", placeholder="https://www.youtube.com/watch?v=...", key="link_input")
+    video_url = st.text_input("YouTube Video URL:", placeholder="https://youtube.com...", key="link_input")
     if st.button("Generate Summary from Link", type="primary"):
         if not api_key:
-            st.error("API Key missing in server configurations.")
+            st.warning("Please enter your Gemini API key in the sidebar first!")
         elif not video_url:
             st.warning("Please provide a valid YouTube link.")
         else:
@@ -45,7 +41,6 @@ with tab1:
                 if full_transcript:
                     with st.spinner("Gemini AI is analyzing..."):
                         try:
-                            # MODERN CLIENT FORMAT
                             client = genai.Client(api_key=api_key)
                             response = client.models.generate_content(
                                 model='gemini-2.5-flash',
@@ -62,13 +57,13 @@ with tab2:
     
     if st.button("Generate Summary from Text", type="primary", key="text_button"):
         if not api_key:
-            st.error("API Key missing in server configurations.")
+            st.warning("Please enter your Gemini API key in the sidebar first!")
         elif not manual_transcript.strip():
             st.warning("Please paste some text first.")
         else:
             with st.spinner("Gemini AI is analyzing your text..."):
                 try:
-                    # FIX: Explicitly passing the api_key string right into the client initialization
+                    # Initialize client with manual string
                     client = genai.Client(api_key=str(api_key).strip())
                     response = client.models.generate_content(
                         model='gemini-2.5-flash',
