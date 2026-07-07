@@ -7,14 +7,13 @@ st.set_page_config(page_title="AI YouTube Summarizer", page_icon="📺", layout=
 st.title("📺 Smart YouTube Video Summarizer")
 st.write("Generate an AI summary of a YouTube video using its link or transcript text.")
 
-# Automatically load the secret key from Streamlit's vault in the background
+# Automatically pull the key out of your secure Streamlit secrets vault
 api_key = st.secrets.get("GEMINI_API_KEY", "")
 
-# Create two tabs for a bulletproof application interface
 tab1, tab2 = st.tabs(["🔗 Summarize via Link", "📝 Paste Transcript Directly"])
 
 with tab1:
-    video_url = st.text_input("YouTube Video URL:", placeholder="https://youtube.com...", key="link_input")
+    video_url = st.text_input("YouTube Video URL:", placeholder="https://www.youtube.com/watch?v=...", key="link_input")
     if st.button("Generate Summary from Link", type="primary"):
         if not api_key:
             st.error("API Key missing in server configurations.")
@@ -39,6 +38,7 @@ with tab1:
                 if full_transcript:
                     with st.spinner("Gemini AI is analyzing..."):
                         try:
+                            # MODERN CLIENT FORMAT
                             client = genai.Client(api_key=api_key)
                             response = client.models.generate_content(
                                 model='gemini-2.5-flash',
@@ -61,7 +61,8 @@ with tab2:
         else:
             with st.spinner("Gemini AI is analyzing your text..."):
                 try:
-                    client = genai.Client(api_key=api_key)
+                    # FIX: Explicitly passing the api_key string right into the client initialization
+                    client = genai.Client(api_key=str(api_key).strip())
                     response = client.models.generate_content(
                         model='gemini-2.5-flash',
                         contents=f"Provide a concise summary broken into 'Key Takeaways' and a 'Detailed Summary' for this text:\n\n{manual_transcript}"
