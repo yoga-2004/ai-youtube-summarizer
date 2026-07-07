@@ -9,7 +9,7 @@ st.write("Paste a YouTube link below to generate an AI summary of the video tran
 
 with st.sidebar:
     st.header("🔑 Configuration")
-    api_key = st.text_input("Enter Gemini API Key:", type="password")
+    api_key = st.sidebar.text_input("Enter Gemini API Key:", value=st.secrets.get("GEMINI_API_KEY", ""), type="password")
 
 def extract_video_id(url):
     pattern = r"(?:v=|\/shorts\/|\/embed\/|\/v\/|youtu\.be\/|\/watch\?v=)([a-zA-Z0-9_-]{11})"
