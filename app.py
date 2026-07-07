@@ -8,7 +8,14 @@ st.title("📺 Smart YouTube Video Summarizer")
 st.write("Generate an AI summary of a YouTube video using its link or transcript text.")
 
 # Automatically pull the key out of your secure Streamlit secrets vault
+# Check the secret vault first; if empty, let the user type it manually in the sidebar
 api_key = st.secrets.get("GEMINI_API_KEY", "")
+
+if not api_key:
+    with st.sidebar:
+        st.header("🔑 Configuration")
+        api_key = st.text_input("Enter Gemini API Key:", type="password")
+
 
 tab1, tab2 = st.tabs(["🔗 Summarize via Link", "📝 Paste Transcript Directly"])
 
